@@ -10,7 +10,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# Initialize Session States
+# Initialize Session States (Master Account Details)
 if "users_db" not in st.session_state:
     st.session_state["users_db"] = [
         {
@@ -18,9 +18,9 @@ if "users_db" not in st.session_state:
             "contact": "rshivaji@gmail.com", 
             "username": "RSHIVAJI", 
             "password": "Rshivaji@1", 
-            "dob": "2000-01-01", 
+            "dob": "2000-09-16", 
             "gender": "Male", 
-            "hero": "superman", 
+            "hero": "Ramcharan", 
             "bio": "Master Admin 👑", 
             "role": "Master", 
             "status": "Active"
@@ -95,14 +95,15 @@ if not st.session_state["current_user"]:
 
     elif choice == "Master Admin Login":
         st.markdown("<h3 style='color: #d90429;'>👑 Master Verification Screen</h3>", unsafe_allow_html=True)
-        st.info("📌 మాస్టర్ అడ్మిన్ యాప్ ఓపెన్ కావడానికి మీ వివరాలు ఇవ్వండి!")
-        m_uname = st.text_input("Master Username:")
-        m_pwd = st.text_input("Master Password:", type="password")
+        st.info("📌 మీ వివరాలు (Username, Password, DOB, Gender, Secret Hero Name) ఎంటర్ చేయండి!")
         
-        # Unlimited past years date picker (From year 1900)
-        m_dob = st.date_input("Master Date of Birth (DOB):", min_value=date(1900, 1, 1), value=date(2000, 1, 1))
+        m_uname = st.text_input("Master Username:", value="RSHIVAJI")
+        m_pwd = st.text_input("Master Password:", type="password", value="Rshivaji@1")
+        
+        # Unlimited past years date picker (From year 1900, default set to 2000-09-16)
+        m_dob = st.date_input("Master Date of Birth (DOB):", min_value=date(1900, 1, 1), value=date(2000, 9, 16))
         m_gender = st.selectbox("Master Gender", ["Male", "Female", "Other"])
-        m_hero = st.text_input("Secret Hero Name:", type="password")
+        m_hero = st.text_input("Secret Hero Name (e.g. Ramcharan):", type="password")
         
         if st.button("Open Master App 👑"):
             verified = False
@@ -111,7 +112,7 @@ if not st.session_state["current_user"]:
                     u["password"] == m_pwd and 
                     u["dob"] == str(m_dob) and 
                     u["gender"] == m_gender and 
-                    u.get("hero", "").lower() == m_hero.lower() and 
+                    u.get("hero", "").strip().lower() == m_hero.strip().lower() and 
                     u["role"] == "Master"):
                     verified = True
                     break
@@ -122,7 +123,7 @@ if not st.session_state["current_user"]:
                 st.success("👑 Master Admin Verified Successfully!")
                 st.rerun()
             else:
-                st.error("❌ ఇచ్చిన వివరాలు సరిపోలలేదు! (డిఫాల్ట్: username: RSHIVAJI, password: Rshivaji@1)")
+                st.error("❌ ఇచ్చిన వివరాలు (Username, Password, DOB లేదా Hero Name) సరిపోలలేదు!")
                 
     elif choice == "Register (New User)":
         reg_name = st.text_input("Full Name:")
@@ -191,18 +192,23 @@ else:
         st.markdown(f"<h1 style='color: #d90429;'>👑 KA Text PDF Pics - Master Admin Dashboard</h1>", unsafe_allow_html=True)
         st.write(f"Welcome Admin: **{user_name}**")
         
-        # Master Settings to change Username & Password
-        with st.expander("⚙️ Master Account Settings (Change Username/Password)"):
-            new_m_uname = st.text_input("New Master Username:", value=next((u['username'] for u in st.session_state["users_db"] if u['role'] == "Master"), ""))
-            new_m_pwd = st.text_input("New Master Password:", type="password")
-            if st.button("Update Master Credentials 🔄"):
+        # Master Settings to change Username, Password & Secret Hero Name
+        with st.expander("⚙️ Master Account Settings (Change Credentials & Hero Name)"):
+            master_obj = next((u for u in st.session_state["users_db"] if u['role'] == "Master"), {})
+            new_m_uname = st.text_input("New Master Username:", value=master_obj.get('username', ''))
+            new_m_pwd = st.text_input("New Master Password:", type="password", value=master_obj.get('password', ''))
+            new_m_hero = st.text_input("New Secret Hero Name:", value=master_obj.get('hero', ''))
+            
+            if st.button("Update Master Security Details 🔄"):
                 for u in st.session_state["users_db"]:
                     if u['role'] == "Master":
                         if new_m_uname:
                             u["username"] = new_m_uname
                         if new_m_pwd:
                             u["password"] = new_m_pwd
-                st.success("✅ మాస్టర్ వివరాలు విజయవంతంగా మార్చబడ్డాయి!")
+                        if new_m_hero:
+                            u["hero"] = new_m_hero
+                st.success("✅ మాస్టర్ సెక్యూరిటీ వివరాలు విజయవంతంగా మార్చబడ్డాయి!")
                 st.rerun()
 
         st.subheader("📊 Registered Users List & Controls")
@@ -364,4 +370,4 @@ else:
         if st.button("Logout 🚪"):
             st.session_state["current_user"] = None
             st.rerun()
-    
+                        
