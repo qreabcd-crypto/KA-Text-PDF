@@ -26,7 +26,7 @@ if not api_key:
 # Configure Gemini Client
 genai.configure(api_key=api_key)
 
-# High-Speed Gemini Model setup with Google Search Grounding Enabled
+# High-Speed Gemini Model setup (Clean & Error-Free)
 generation_config = {
     "temperature": 0.2,
     "max_output_tokens": 1024,
@@ -34,12 +34,11 @@ generation_config = {
 
 model = genai.GenerativeModel(
     model_name="gemini-3.8-flash",
-    generation_config=generation_config,
-    tools=["google_search"]
+    generation_config=generation_config
 )
 
-st.title("⚡ Ultra Fast Gemini AI (Live Search)")
-st.write("గూగుల్ లాగా లైవ్ వెబ్ సెర్చ్ చేసి క్షణాల్లో సమాధానం పొందండి.")
+st.title("⚡ Ultra Fast Gemini AI")
+st.write("అతి వేగంగా, క్షణాల్లో రెస్పాన్స్ పొందండి.")
 
 # Language Switcher
 language = st.selectbox(
@@ -51,15 +50,15 @@ language = st.selectbox(
 # System Instructions
 if language == "తెలుగు (Telugu)":
     lang_instruction = (
-        "మీరు చాలా వేగంగా స్పందించే AI అసిస్టెంట్ మరియు అవసరమైనప్పుడు గూగుల్ ద్వారా లైవ్ సమాచారాన్ని వెతికి తెలపగలరు. "
-        "యూజర్ కేవలం 'హాయ్' లేదా 'Hi' అంటే, 'నమస్కారం! నేను మీకు ఏవిధంగా సహాయపడగలను?' అని తక్షణమే బదులివ్వండి. "
-        "మిగతా ప్రశ్నలకు వెబ్ నుండి తాజా సమాచారాన్ని సేకరించి, ఎటువంటి అక్షర దోషాలు లేకుండా స్పష్టంగా మరియు సెకన్లలో సమాధానం ఇవ్వండి."
+        "మీరు చాలా వేగంగా స్పందించే AI అసిస్టెంట్. యూజర్ కేవలం 'హాయ్' లేదా 'Hi' అంటే, "
+        "'నమస్కారం! నేను మీకు ఏవిధంగా సహాయపడగలను?' అని తక్షణమే బదులివ్వండి. "
+        "మిగతా ప్రశ్నలకు ఎటువంటి అక్షర దోషాలు లేకుండా స్పష్టంగా మరియు సెకన్లలో సమాధానం ఇవ్వండి."
     )
 else:
     lang_instruction = (
-        "You are an ultra-fast AI assistant with live Google Search capabilities. "
-        "If the user simply says 'Hi', respond instantly with 'Hello! How can I help you today?'. "
-        "For other queries, search the web live and provide lightning-fast, highly accurate responses with zero errors."
+        "You are an ultra-fast AI assistant. If the user simply says 'Hi', "
+        "respond instantly with 'Hello! How can I help you today?'. "
+        "For other queries, provide lightning-fast, highly accurate responses with zero errors."
     )
 
 # Initialize Chat History in Session State if not exists
@@ -82,7 +81,7 @@ if user_prompt := st.chat_input("మీ ప్రశ్న ఇక్కడ ట�
         st.markdown(user_prompt)
 
     with st.chat_message("assistant"):
-        with st.spinner("లైవ్ వెబ్ సెర్చ్ జరుగుతోంది..."):
+        with st.spinner("రెస్పాన్స్ సిద్ధమవుతోంది..."):
             try:
                 full_prompt = f"{lang_instruction}\n\nUser Query: {user_prompt}"
                 content_input = [full_prompt]
@@ -118,4 +117,4 @@ if user_prompt := st.chat_input("మీ ప్రశ్న ఇక్కడ ట�
 
             except Exception as e:
                 st.error(f"ఎర్రర్ వచ్చింది: {e}")
-            
+                
