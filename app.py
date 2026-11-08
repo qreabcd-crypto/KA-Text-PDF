@@ -59,7 +59,7 @@ if prompt or uploaded_file:
         with st.spinner("యోచిస్తోంది..."):
             try:
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-3.8-flash",
                     contents=user_content,
                 )
                 ai_response = response.text
