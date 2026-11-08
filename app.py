@@ -15,18 +15,18 @@ if not api_key:
 # Configure Gemini Client
 genai.configure(api_key=api_key)
 
-# High-Speed Gemini Model setup
+# Using the correct, stable and ultra-fast Gemini model
 generation_config = {
     "temperature": 0.2,
     "max_output_tokens": 1024,
 }
 
 model = genai.GenerativeModel(
-    model_name="gemini-3.8-flash",
+    model_name="gemini-1.5-flash",
     generation_config=generation_config
 )
 
-st.title("⚡ Ultra Fast Gemini AI Pro")
+st.title("⚡ Ultra Fast Gemini AI")
 st.write("అతి వేగంగా, క్షణాల్లో సమాధానం పొందండి.")
 
 # Language Switcher
@@ -36,12 +36,12 @@ language = st.selectbox(
     key="lang_select"
 )
 
-# System Instructions for instant and clear responses
+# System Instructions
 if language == "తెలుగు (Telugu)":
     lang_instruction = (
         "మీరు అత్యంత వేగంగా స్పందించే AI అసిస్టెంట్. యూజర్ కేవలం 'హాయ్' లేదా 'Hi' అంటే, "
         "'నమస్కారం! నేను మీకు ఏవిధంగా సహాయపడగలను?' అని తక్షణమే బదులివ్వండి. "
-        "ఇంటర్నెట్ మరియు మీ జ్ఞానాన్ని ఉపయోగించి ప్రతి ప్రశ్నకి ఎటువంటి ఆలస్యం లేకుండా, స్పష్టమైన తెలుగులో సెకన్లలో సమాధానం ఇవ్వండి."
+        "ప్రతి ప్రశ్నకి ఎటువంటి ఆలస్యం లేకుండా, స్పష్టమైన తెలుగులో సెకన్లలో సమాధానం ఇవ్వండి."
     )
 else:
     lang_instruction = (
