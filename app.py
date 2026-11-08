@@ -1,6 +1,6 @@
 import streamlit as st
 from fpdf import FPDF
-from datetime import datetime
+from datetime import datetime, date
 import random
 
 # 1. Page Config & Title
@@ -10,18 +10,18 @@ st.set_page_config(
     layout="centered"
 )
 
-# Initialize Session States (Master Admin only as default root, others dynamic)
+# Initialize Session States
 if "users_db" not in st.session_state:
     st.session_state["users_db"] = [
         {
-            "name": "Bujji", 
-            "contact": "bujji@gmail.com", 
-            "username": "bujji", 
-            "password": "123", 
-            "dob": "2000-08-15", 
-            "gender": "Female", 
+            "name": "RSHIVAJI", 
+            "contact": "rshivaji@gmail.com", 
+            "username": "RSHIVAJI", 
+            "password": "Rshivaji@1", 
+            "dob": "2000-01-01", 
+            "gender": "Male", 
             "hero": "superman", 
-            "bio": "Master Admin ❤️", 
+            "bio": "Master Admin 👑", 
             "role": "Master", 
             "status": "Active"
         }
@@ -41,7 +41,7 @@ if "num1" not in st.session_state:
 if "num2" not in st.session_state:
     st.session_state["num2"] = random.randint(1, 9)
 
-# Dynamic Styling (Dark Mode / Light Mode support)
+# Dynamic Styling
 if st.session_state["dark_mode"]:
     bg_color, text_color = "#1e1e24", "#ffffff"
 else:
@@ -95,11 +95,13 @@ if not st.session_state["current_user"]:
 
     elif choice == "Master Admin Login":
         st.markdown("<h3 style='color: #d90429;'>👑 Master Verification Screen</h3>", unsafe_allow_html=True)
-        st.info("📌 మాస్టర్ అడ్మిన్ యాప్ ఓపెన్ కావడానికి అన్ని సెక్యూరిటీ వివరాలు ఇవ్వండి!")
+        st.info("📌 మాస్టర్ అడ్మిన్ యాప్ ఓపెన్ కావడానికి మీ వివరాలు ఇవ్వండి!")
         m_uname = st.text_input("Master Username:")
         m_pwd = st.text_input("Master Password:", type="password")
-        m_dob = st.date_input("Master Date of Birth (DOB):")
-        m_gender = st.selectbox("Master Gender", ["Female", "Male", "Other"])
+        
+        # Unlimited past years date picker (From year 1900)
+        m_dob = st.date_input("Master Date of Birth (DOB):", min_value=date(1900, 1, 1), value=date(2000, 1, 1))
+        m_gender = st.selectbox("Master Gender", ["Male", "Female", "Other"])
         m_hero = st.text_input("Secret Hero Name:", type="password")
         
         if st.button("Open Master App 👑"):
@@ -115,24 +117,23 @@ if not st.session_state["current_user"]:
                     break
             
             if verified:
-                st.session_state["current_user"] = "Bujji"
+                st.session_state["current_user"] = u["name"]
                 st.session_state["is_master"] = True
                 st.success("👑 Master Admin Verified Successfully!")
                 st.rerun()
             else:
-                st.error("❌ వివరాలు సరిపోలలేదు! మాస్టర్ యాప్ ఓపెన్ అవ్వదు.")
+                st.error("❌ ఇచ్చిన వివరాలు సరిపోలలేదు! (డిఫాల్ట్: username: RSHIVAJI, password: Rshivaji@1)")
                 
     elif choice == "Register (New User)":
         reg_name = st.text_input("Full Name:")
         reg_contact = st.text_input("Phone Number or Email Address:")
-        reg_dob = st.date_input("Date of Birth (DOB - Used for Password Recovery):")
+        reg_dob = st.date_input("Date of Birth (DOB):", min_value=date(1900, 1, 1))
         reg_gender = st.selectbox("Gender", ["Female", "Male", "Other"])
         reg_uname = st.text_input("Create Username:")
         reg_pwd = st.text_input("Create Password:", type="password")
         
         if st.button("Register Now ✨"):
             if reg_uname and reg_pwd and reg_name and reg_contact:
-                # Check if username already exists
                 exists = any(u["username"] == reg_uname for u in st.session_state["users_db"])
                 if exists:
                     st.warning("⚠️ ఈ Username ఇప్పటికే వాడబడింది. వేరేది ట్రై చేయండి!")
@@ -149,14 +150,14 @@ if not st.session_state["current_user"]:
                         "role": "User", 
                         "status": "Active"
                     })
-                    st.success("✅ Account Created Successfully! (అకౌంట్ సక్సెస్‌గా క్రియేట్ అయింది). ఇప్పుడు 'Login (User)' ద్వారా లాగిన్ అవ్వండి.")
+                    st.success("✅ Account Created Successfully! ఇప్పుడు 'Login (User)' ద్వారా లాగిన్ అవ్వండి.")
             else:
                 st.warning("దయచేసి అన్ని వివరాలు నింపండి!")
 
     elif choice == "Forgot Password (via DOB)":
         st.info("💡 పాస్‌వర్డ్ రీసెట్ చేయడానికి మీ Username మరియు మీ పుట్టిన తేదీ (DOB) ఎంటర్ చేయండి.")
         rec_uname = st.text_input("Your Username:")
-        rec_dob = st.date_input("Your Date of Birth (DOB):")
+        rec_dob = st.date_input("Your Date of Birth (DOB):", min_value=date(1900, 1, 1))
         new_pwd = st.text_input("New Password:", type="password")
         
         if st.button("Reset Password 🔄"):
@@ -174,14 +175,12 @@ if not st.session_state["current_user"]:
 else:
     user_name = st.session_state["current_user"]
     
-    # Theme Quick Toggle Header
     col1, col2 = st.columns([3, 1])
     with col2:
         if st.button("🌙 / ☀️ Theme"):
             st.session_state["dark_mode"] = not st.session_state["dark_mode"]
             st.rerun()
 
-    # Automatic Birthday Wishes Check
     today_date = datetime.now().strftime("%Y-%m-%d")
     for u in st.session_state["users_db"]:
         if u["name"] == user_name and u.get("dob", "")[5:] == today_date[5:]:
@@ -192,6 +191,20 @@ else:
         st.markdown(f"<h1 style='color: #d90429;'>👑 KA Text PDF Pics - Master Admin Dashboard</h1>", unsafe_allow_html=True)
         st.write(f"Welcome Admin: **{user_name}**")
         
+        # Master Settings to change Username & Password
+        with st.expander("⚙️ Master Account Settings (Change Username/Password)"):
+            new_m_uname = st.text_input("New Master Username:", value=next((u['username'] for u in st.session_state["users_db"] if u['role'] == "Master"), ""))
+            new_m_pwd = st.text_input("New Master Password:", type="password")
+            if st.button("Update Master Credentials 🔄"):
+                for u in st.session_state["users_db"]:
+                    if u['role'] == "Master":
+                        if new_m_uname:
+                            u["username"] = new_m_uname
+                        if new_m_pwd:
+                            u["password"] = new_m_pwd
+                st.success("✅ మాస్టర్ వివరాలు విజయవంతంగా మార్చబడ్డాయి!")
+                st.rerun()
+
         st.subheader("📊 Registered Users List & Controls")
         for idx, usr in enumerate(st.session_state["users_db"]):
             st.markdown(f"""
@@ -351,4 +364,4 @@ else:
         if st.button("Logout 🚪"):
             st.session_state["current_user"] = None
             st.rerun()
-                    
+    
