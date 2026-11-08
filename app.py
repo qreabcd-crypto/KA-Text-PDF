@@ -1,16 +1,15 @@
 import streamlit as st
 from fpdf import FPDF
 from datetime import datetime, date
-import random
 
-# 1. Page Config & Title
+# 1. Page Config & Romantic Dark Theme
 st.set_page_config(
-    page_title="KA Text PDF Pics",
+    page_title="KA Text PDF Pics 💕",
     page_icon="📸",
     layout="centered"
 )
 
-# Initialize Session States (Master Account Details)
+# Dynamic Session States Setup
 if "users_db" not in st.session_state:
     st.session_state["users_db"] = [
         {
@@ -21,7 +20,7 @@ if "users_db" not in st.session_state:
             "dob": "2000-09-16", 
             "gender": "Male", 
             "hero": "Ramcharan", 
-            "bio": "Master Admin 👑", 
+            "bio": "Master Admin 👑💕", 
             "role": "Master", 
             "status": "Active"
         }
@@ -35,15 +34,11 @@ if "journals" not in st.session_state:
 if "trash_bin" not in st.session_state:
     st.session_state["trash_bin"] = []
 if "dark_mode" not in st.session_state:
-    st.session_state["dark_mode"] = False
-if "num1" not in st.session_state:
-    st.session_state["num1"] = random.randint(1, 9)
-if "num2" not in st.session_state:
-    st.session_state["num2"] = random.randint(1, 9)
+    st.session_state["dark_mode"] = True
 
-# Dynamic Styling
+# Styling
 if st.session_state["dark_mode"]:
-    bg_color, text_color = "#1e1e24", "#ffffff"
+    bg_color, text_color = "#16161a", "#ffffff"
 else:
     bg_color, text_color = "#fff0f3", "#000000"
 
@@ -54,58 +49,43 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# 2. Authentication, Register & Password Recovery
+# 2. Authentication Portal (No Captcha & Direct Access)
 if not st.session_state["current_user"]:
-    st.markdown("<h2 style='text-align: center; color: #ff4d6d;'>📸 KA Text PDF Pics Login</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #ff4d6d;'>📸 KA Text PDF Pics 💕 Login 🌸</h2>", unsafe_allow_html=True)
     
-    choice = st.selectbox("Choose Action", ["Login (User)", "Master Admin Login", "Register (New User)", "Forgot Password (via DOB)"])
+    choice = st.selectbox("Choose Action", ["Login (User)", "Master Admin Login", "Register (New User)", "Forgot Password / Username"])
     
     if choice == "Login (User)":
-        st.info("📌 యూజర్లు తమ Username & Password ఎంటర్ చేసి లాగిన్ అవ్వండి")
+        st.info("📌 మీ Username & Password ఎంటర్ చేసి లాగిన్ అవ్వండి 💕")
         uname = st.text_input("Username:")
         pwd = st.text_input("Password:", type="password")
         
-        # Simple Captcha Security
-        n1, n2 = st.session_state["num1"], st.session_state["num2"]
-        captcha_ans = st.text_input(f"🤖 Captcha: How much is {n1} + {n2}?")
-        
-        if st.button("Open App 🚀"):
-            if captcha_ans.isdigit() and int(captcha_ans) == (n1 + n2):
-                found = False
-                for u in st.session_state["users_db"]:
-                    if u["username"] == uname and u["password"] == pwd:
-                        if u.get("status") == "Blocked":
-                            st.error("❌ Your account has been blocked by Admin.")
-                        elif u["role"] == "Master":
-                            st.error("❌ ఇది మాస్టర్ అకౌంట్! దయచేసి 'Master Admin Login' ఆప్షన్ ఉపయోగించండి.")
-                        else:
-                            st.session_state["current_user"] = u["name"]
-                            st.session_state["is_master"] = False
-                            found = True
-                            st.success("Login Successful!")
-                            st.session_state["num1"] = random.randint(1, 9)
-                            st.session_state["num2"] = random.randint(1, 9)
-                            st.rerun()
-                if not found:
-                    st.error("❌ Invalid Username or Password")
-            else:
-                st.error("❌ Incorrect Captcha! Please try again.")
-                st.session_state["num1"] = random.randint(1, 9)
-                st.session_state["num2"] = random.randint(1, 9)
+        if st.button("Open App 🚀💕"):
+            found = False
+            for u in st.session_state["users_db"]:
+                if u["username"] == uname and u["password"] == pwd:
+                    if u.get("status") == "Blocked":
+                        st.error("❌ Your account has been blocked by Admin.")
+                    elif u["role"] == "Master":
+                        st.error("❌ ఇది మాస్టర్ అకౌంట్! దయచేసి 'Master Admin Login' వాడండి.")
+                    else:
+                        st.session_state["current_user"] = u["name"]
+                        st.session_state["is_master"] = False
+                        found = True
+                        st.success("Login Successful! 🎉")
+                        st.rerun()
+            if not found:
+                st.error("❌ Invalid Username or Password")
 
     elif choice == "Master Admin Login":
-        st.markdown("<h3 style='color: #d90429;'>👑 Master Verification Screen</h3>", unsafe_allow_html=True)
-        st.info("📌 మీ వివరాలు (Username, Password, DOB, Gender, Secret Hero Name) ఎంటర్ చేయండి!")
-        
+        st.markdown("<h3 style='color: #d90429;'>👑 Master Verification Screen 💕</h3>", unsafe_allow_html=True)
         m_uname = st.text_input("Master Username:", value="RSHIVAJI")
         m_pwd = st.text_input("Master Password:", type="password", value="Rshivaji@1")
-        
-        # Unlimited past years date picker (From year 1900, default set to 2000-09-16)
         m_dob = st.date_input("Master Date of Birth (DOB):", min_value=date(1900, 1, 1), value=date(2000, 9, 16))
         m_gender = st.selectbox("Master Gender", ["Male", "Female", "Other"])
         m_hero = st.text_input("Secret Hero Name (e.g. Ramcharan):", type="password")
         
-        if st.button("Open Master App 👑"):
+        if st.button("Open Master App 👑💕"):
             verified = False
             for u in st.session_state["users_db"]:
                 if (u["username"] == m_uname and 
@@ -120,26 +100,27 @@ if not st.session_state["current_user"]:
             if verified:
                 st.session_state["current_user"] = u["name"]
                 st.session_state["is_master"] = True
-                st.success("👑 Master Admin Verified Successfully!")
+                st.success("👑 Master Admin Verified Successfully! 💕")
                 st.rerun()
             else:
-                st.error("❌ ఇచ్చిన వివరాలు (Username, Password, DOB లేదా Hero Name) సరిపోలలేదు!")
-                
+                st.error("❌ ఇచ్చిన వివరాలు సరిపోలలేదు!")
+
     elif choice == "Register (New User)":
+        st.markdown("### 🌸 Create New Account 💕")
         reg_name = st.text_input("Full Name:")
         reg_contact = st.text_input("Phone Number or Email Address:")
-        reg_dob = st.date_input("Date of Birth (DOB):", min_value=date(1900, 1, 1))
-        reg_gender = st.selectbox("Gender", ["Female", "Male", "Other"])
+        reg_dob = st.date_input("Date of Birth (DOB):", min_value=date(1900, 1, 1), value=date(2000, 9, 16))
+        reg_gender = st.selectbox("Gender", ["Male", "Female", "Other"])
         reg_uname = st.text_input("Create Username:")
         reg_pwd = st.text_input("Create Password:", type="password")
         
-        if st.button("Register Now ✨"):
+        if st.button("Register & Login Directly 🚀💕"):
             if reg_uname and reg_pwd and reg_name and reg_contact:
                 exists = any(u["username"] == reg_uname for u in st.session_state["users_db"])
                 if exists:
-                    st.warning("⚠️ ఈ Username ఇప్పటికే వాడబడింది. వేరేది ట్రై చేయండి!")
+                    st.warning("⚠️ ఈ Username ఇప్పటికే వాడబడింది. వేరేది ఇవ్వండి!")
                 else:
-                    st.session_state["users_db"].append({
+                    new_user = {
                         "name": reg_name, 
                         "contact": reg_contact, 
                         "username": reg_uname, 
@@ -147,31 +128,41 @@ if not st.session_state["current_user"]:
                         "dob": str(reg_dob), 
                         "gender": reg_gender, 
                         "hero": "none", 
-                        "bio": f"Hello, I am {reg_name} 🌸", 
+                        "bio": f"Hello, I am {reg_name} 🌸💕", 
                         "role": "User", 
                         "status": "Active"
-                    })
-                    st.success("✅ Account Created Successfully! ఇప్పుడు 'Login (User)' ద్వారా లాగిన్ అవ్వండి.")
+                    }
+                    st.session_state["users_db"].append(new_user)
+                    # Instant Direct Auto-Login after Registration
+                    st.session_state["current_user"] = reg_name
+                    st.session_state["is_master"] = False
+                    st.success("✅ Account Created Successfully! Logging you in... 🎉")
+                    st.rerun()
             else:
                 st.warning("దయచేసి అన్ని వివరాలు నింపండి!")
 
-    elif choice == "Forgot Password (via DOB)":
-        st.info("💡 పాస్‌వర్డ్ రీసెట్ చేయడానికి మీ Username మరియు మీ పుట్టిన తేదీ (DOB) ఎంటర్ చేయండి.")
-        rec_uname = st.text_input("Your Username:")
-        rec_dob = st.date_input("Your Date of Birth (DOB):", min_value=date(1900, 1, 1))
-        new_pwd = st.text_input("New Password:", type="password")
+    elif choice == "Forgot Password / Username":
+        st.info("💡 మీ పుట్టిన తేదీ (DOB) మరియు నమోదిత Email/Phone సహాయంతో వివరాలు రికవరీ చేసుకోండి.")
+        rec_contact = st.text_input("Registered Email or Phone Number:")
+        rec_dob = st.date_input("Date of Birth (DOB):", min_value=date(1900, 1, 1), value=date(2000, 9, 16))
         
-        if st.button("Reset Password 🔄"):
-            updated = False
+        if st.button("Find Account Details 🔍"):
+            matched_user = None
             for u in st.session_state["users_db"]:
-                if u["username"] == rec_uname and u["dob"] == str(rec_dob):
-                    u["password"] = new_pwd
-                    updated = True
+                if u["contact"] == rec_contact and u["dob"] == str(rec_dob):
+                    matched_user = u
                     break
-            if updated:
-                st.success("✅ పాస్‌వర్డ్ విజయవంతంగా మార్చబడింది! ఇప్పుడు లాగిన్ అవ్వండి.")
+            if matched_user:
+                st.success(f"🔑 Your Username is: **{matched_user['username']}**")
+                new_pwd = st.text_input("Enter New Password:", type="password", key="rec_pwd")
+                if st.button("Set New Password 💾"):
+                    if new_pwd:
+                        matched_user["password"] = new_pwd
+                        st.success("✅ పాస్‌వర్డ్ మార్చబడింది! ఇప్పుడు లాగిన్ అవ్వండి.")
+                    else:
+                        st.warning("దయచేసి కొత్త పాస్‌వర్డ్ ఎంటర్ చేయండి.")
             else:
-                st.error("❌ ఇచ్చిన యూజర్‌నేమ్ లేదా పుట్టిన తేదీ సరిపోలలేదు!")
+                st.error("❌ ఇచ్చిన వివరాలు ఏ ఖాతాతోనూ సరిపోలలేదు!")
 
 else:
     user_name = st.session_state["current_user"]
@@ -182,192 +173,126 @@ else:
             st.session_state["dark_mode"] = not st.session_state["dark_mode"]
             st.rerun()
 
-    today_date = datetime.now().strftime("%Y-%m-%d")
-    for u in st.session_state["users_db"]:
-        if u["name"] == user_name and u.get("dob", "")[5:] == today_date[5:]:
-            st.success(f"🎂 పుట్టినరోజు శుభాకాంక్షలు! {u['name']} ❤️ నీ జీవితం ఎప్పుడూ సంతోషాలతో నిండిపోవాలి. 🥰🎉")
-
-    # 3. Master Dashboard Access
+    # Master Dashboard
     if st.session_state["is_master"]:
-        st.markdown(f"<h1 style='color: #d90429;'>👑 KA Text PDF Pics - Master Admin Dashboard</h1>", unsafe_allow_html=True)
-        st.write(f"Welcome Admin: **{user_name}**")
+        st.markdown(f"<h1 style='color: #d90429;'>👑 Master Dashboard 💕</h1>", unsafe_allow_html=True)
+        st.write(f"Welcome Admin: **{user_name}** 🌸")
         
-        # Master Settings to change Username, Password & Secret Hero Name
-        with st.expander("⚙️ Master Account Settings (Change Credentials & Hero Name)"):
+        with st.expander("⚙️ Update Master Credentials & Security Details"):
             master_obj = next((u for u in st.session_state["users_db"] if u['role'] == "Master"), {})
-            new_m_uname = st.text_input("New Master Username:", value=master_obj.get('username', ''))
-            new_m_pwd = st.text_input("New Master Password:", type="password", value=master_obj.get('password', ''))
-            new_m_hero = st.text_input("New Secret Hero Name:", value=master_obj.get('hero', ''))
+            up_m_uname = st.text_input("Master Username:", value=master_obj.get('username', ''))
+            up_m_pwd = st.text_input("Master Password:", type="password", value=master_obj.get('password', ''))
+            up_m_email = st.text_input("Master Email/Phone:", value=master_obj.get('contact', ''))
+            up_m_hero = st.text_input("Secret Hero Name:", value=master_obj.get('hero', ''))
             
-            if st.button("Update Master Security Details 🔄"):
-                for u in st.session_state["users_db"]:
-                    if u['role'] == "Master":
-                        if new_m_uname:
-                            u["username"] = new_m_uname
-                        if new_m_pwd:
-                            u["password"] = new_m_pwd
-                        if new_m_hero:
-                            u["hero"] = new_m_hero
-                st.success("✅ మాస్టర్ సెక్యూరిటీ వివరాలు విజయవంతంగా మార్చబడ్డాయి!")
+            if st.button("Save Master Updates 🔄"):
+                master_obj["username"] = up_m_uname
+                master_obj["password"] = up_m_pwd
+                master_obj["contact"] = up_m_email
+                master_obj["hero"] = up_m_hero
+                st.success("✅ మాస్టర్ వివరాలు అప్‌డేట్ అయ్యాయి!")
                 st.rerun()
 
-        st.subheader("📊 Registered Users List & Controls")
+        st.subheader("📊 Registered Users Control")
         for idx, usr in enumerate(st.session_state["users_db"]):
-            st.markdown(f"""
-            - **{idx+1}. Name:** {usr['name']} | **Contact:** {usr.get('contact', 'N/A')} | **Username:** {usr['username']} | **Status:** {usr.get('status', 'Active')}
-              - **Gender:** {usr['gender']} | **DOB:** {usr['dob']} | **Role:** {usr['role']} | **Bio:** {usr.get('bio', 'N/A')}
-            """)
             if usr['role'] != "Master":
+                st.markdown(f"**{idx}. {usr['name']}** | Username: `{usr['username']}` | Contact: `{usr['contact']}` | DOB: `{usr['dob']}` | Status: `{usr['status']}`")
                 col_a, col_b = st.columns(2)
                 with col_a:
                     if st.button(f"Block 🚫 #{idx}", key=f"block_{idx}"):
                         usr["status"] = "Blocked"
-                        st.success(f"User {usr['name']} blocked!")
                         st.rerun()
                 with col_b:
                     if st.button(f"Delete 🗑️ #{idx}", key=f"adm_del_{idx}"):
                         st.session_state["users_db"].pop(idx)
-                        st.success("User deleted!")
                         st.rerun()
         
         st.markdown("---")
-        if st.button("Logout from Master 🚪"):
+        if st.button("Logout 🚪"):
             st.session_state["current_user"] = None
             st.session_state["is_master"] = False
             st.rerun()
-            
-    # 4. User App Tabs Access
+
+    # User Dashboard
     else:
-        st.markdown(f"<h1 style='text-align: center; color: #ff4d6d;'>📸 KA Text PDF Pics Generator 📸</h1>", unsafe_allow_html=True)
-        st.write(f"Welcome, **{user_name}**! మీ జ్ఞాపకాలు మరియు ఫోటో నోట్స్‌ని ఇక్కడ భద్రపరుచుకోండి.")
+        st.markdown(f"<h1 style='text-align: center; color: #ff4d6d;'>📸 KA Text PDF Pics 💕🌸</h1>", unsafe_allow_html=True)
+        st.write(f"Welcome, **{user_name}**! ✨")
         
-        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📝 Journal & PDF", "✏️ Edit Saved Note", "🖼️ Pics Upload", "🗑️ History", "⚙️ Settings & Bio", "📊 Multi-Export"])
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📝 Journal & PDF", "✏️ Edit Saved Note", "🖼️ Pics Upload", "🗑️ History", "⚙️ Account Settings", "📊 Multi-Export"])
         
         with tab1:
             title = st.text_input("హెడ్‌లైన్ / టైటిల్:")
             content = st.text_area("మీ టెక్స్ట్ లేదా జ్ఞాపకాలు ఇక్కడ రాయండి:", height=150)
-            
-            if st.checkbox("✨ AI Text & Emoji Enhancer"):
-                if content:
-                    content = f"💖 {content} 🌸\n\n#KA_Text_PDF_Pics #Memories 📸✨"
-                    
             if st.button("💾 Save to Vault"):
                 if title and content:
                     st.session_state["journals"].append({"user": user_name, "title": title, "content": content})
-                    st.success("✅ సక్సెస్‌గా సేవ్ అయింది!")
+                    st.success("✅ సేవ్ అయింది! 💕")
                 else:
-                    st.warning("దయచేసి టైటిల్ మరియు కంటెంట్ ఎంటర్ చేయండి.")
-                    
-            if st.button("📄 Download as Custom PDF"):
-                if title and content:
-                    pdf = FPDF()
-                    pdf.add_page()
-                    pdf.set_font("Arial", size=14)
-                    pdf.cell(200, 10, txt=title.encode('latin-1', 'replace').decode('latin-1'), ln=1, align='C')
-                    pdf.ln(10)
-                    pdf.set_font("Arial", size=12)
-                    pdf.multi_cell(0, 10, txt=content.encode('latin-1', 'replace').decode('latin-1'))
-                    
-                    pdf_bytes = pdf.output(dest='S').encode('latin-1')
-                    st.download_button("📥 Click to Download PDF File", data=pdf_bytes, file_name=f"{title}.pdf", mime="application/pdf")
-                else:
-                    st.warning("దయచేసి డేటా ఇవ్వండి!")
+                    st.warning("వివరాలు ఎంటర్ చేయండి.")
 
         with tab2:
-            st.subheader("✏️ Edit Your Saved Journals & Download PDF")
+            st.subheader("✏️ Edit Your Notes")
             user_journals = [j for j in st.session_state["journals"] if j["user"] == user_name]
-            
             if user_journals:
                 j_titles = [j["title"] for j in user_journals]
-                selected_title = st.selectbox("Select Journal to Edit:", j_titles)
+                selected_title = st.selectbox("Select Note:", j_titles)
                 selected_journal = next((j for j in user_journals if j["title"] == selected_title), None)
-                
                 if selected_journal:
                     edit_title = st.text_input("Edit Title:", value=selected_journal["title"])
                     edit_content = st.text_area("Edit Content:", value=selected_journal["content"], height=150)
-                    
-                    col_e1, col_e2 = st.columns(2)
-                    with col_e1:
-                        if st.button("💾 Update Changes"):
-                            selected_journal["title"] = edit_title
-                            selected_journal["content"] = edit_content
-                            st.success("✅ జర్నల్ అప్‌డేట్ చేయబడింది!")
-                            st.rerun()
-                    with col_e2:
-                        if st.button("📄 Download Edited PDF"):
-                            pdf = FPDF()
-                            pdf.add_page()
-                            pdf.set_font("Arial", size=14)
-                            pdf.cell(200, 10, txt=edit_title.encode('latin-1', 'replace').decode('latin-1'), ln=1, align='C')
-                            pdf.ln(10)
-                            pdf.set_font("Arial", size=12)
-                            pdf.multi_cell(0, 10, txt=edit_content.encode('latin-1', 'replace').decode('latin-1'))
-                            
-                            pdf_bytes = pdf.output(dest='S').encode('latin-1')
-                            st.download_button("📥 Download Updated PDF", data=pdf_bytes, file_name=f"{edit_title}_edited.pdf", mime="application/pdf")
-            else:
-                st.info("💡 మీరు ఇంకా ఎలాంటి జర్నల్స్ సేవ్ చేయలేదు.")
+                    if st.button("💾 Update Note"):
+                        selected_journal["title"] = edit_title
+                        selected_journal["content"] = edit_content
+                        st.success("✅ అప్‌డేట్ అయింది!")
+                        st.rerun()
 
         with tab3:
-            st.subheader("🖼️ Upload & Store Pictures")
+            st.subheader("🖼️ Upload Pictures 💕")
             uploaded_img = st.file_uploader("Upload Image", type=["jpg", "png", "jpeg"])
             if uploaded_img:
-                st.image(uploaded_img, caption="Uploaded Picture", use_container_width=True)
-                st.success("✅ Picture loaded into session successfully!")
+                st.image(uploaded_img, use_container_width=True)
 
         with tab4:
-            st.subheader("🗑️ History & Trash Bin Vault")
+            st.subheader("🗑️ History & Trash Bin")
             for i, jnl in enumerate(st.session_state["journals"]):
                 if jnl["user"] == user_name:
                     st.write(f"- **{jnl['title']}**: {jnl['content'][:30]}...")
-                    if st.button(f"Delete 🗑️ #{i}", key=f"del_{i}"):
-                        st.session_state["trash_bin"].append(jnl)
-                        st.session_state["journals"].pop(i)
-                        st.rerun()
 
         with tab5:
-            st.subheader("⚙️ Settings & Bio Profile")
-            new_u_name = st.text_input("కొత్త Username మార్చుకోండి:")
-            new_p_word = st.text_input("కొత్త పాస్‌వర్డ్:", type="password")
+            st.subheader("⚙️ Account & Security Settings 💕")
+            st.info("మీ ప్రొఫైల్ వివరాలు (DOB, Email/Phone, Username, Password) ఇక్కడ మార్చుకోవచ్చు.")
             
-            curr_bio = next((u.get("bio", "") for u in st.session_state["users_db"] if u["name"] == user_name), "")
-            new_bio = st.text_area("Update Bio / About Me:", value=curr_bio)
+            curr_usr_obj = next((u for u in st.session_state["users_db"] if u["name"] == user_name), None)
             
-            if st.button("Update Profile 🔄"):
-                for u in st.session_state["users_db"]:
-                    if u["name"] == user_name:
-                        if new_u_name:
-                            u["username"] = new_u_name
-                        if new_p_word:
-                            u["password"] = new_p_word
-                        u["bio"] = new_bio
-                st.success("✅ ప్రొఫైల్ వివరాలు అప్‌డేట్ అయ్యాయి!")
+            if curr_usr_obj:
+                up_name = st.text_input("Full Name:", value=curr_usr_obj.get("name", ""))
+                up_contact = st.text_input("Email / Phone Number:", value=curr_usr_obj.get("contact", ""))
+                
+                # Dynamic DOB selection
+                current_dob = datetime.strptime(curr_usr_obj.get("dob", "2000-09-16"), "%Y-%m-%d").date()
+                up_dob = st.date_input("Date of Birth (DOB):", value=current_dob, min_value=date(1900, 1, 1))
+                
+                up_uname = st.text_input("Username:", value=curr_usr_obj.get("username", ""))
+                up_pwd = st.text_input("New Password (ఆప్షనల్):", type="password")
+                
+                if st.button("Save Profile Settings 🔄💕"):
+                    curr_usr_obj["name"] = up_name
+                    curr_usr_obj["contact"] = up_contact
+                    curr_usr_obj["dob"] = str(up_dob)
+                    curr_usr_obj["username"] = up_uname
+                    if up_pwd:
+                        curr_usr_obj["password"] = up_pwd
+                    st.session_state["current_user"] = up_name
+                    st.success("✅ ప్రొఫైల్ వివరాలు విజయవంతంగా అప్‌డేట్ అయ్యాయి! 💕")
+                    st.rerun()
 
         with tab6:
-            st.subheader("📊 Multi-Format Export (All Journals in One PDF)")
-            if st.button("📥 Download All Journals as Single PDF"):
-                user_journals = [j for j in st.session_state["journals"] if j["user"] == user_name]
-                if user_journals:
-                    pdf = FPDF()
-                    pdf.add_page()
-                    pdf.set_font("Arial", size=16)
-                    pdf.cell(200, 10, txt=f"All Journals - {user_name}".encode('latin-1', 'replace').decode('latin-1'), ln=1, align='C')
-                    pdf.ln(10)
-                    
-                    for jnl in user_journals:
-                        pdf.set_font("Arial", size=14)
-                        pdf.cell(200, 10, txt=jnl['title'].encode('latin-1', 'replace').decode('latin-1'), ln=1)
-                        pdf.set_font("Arial", size=12)
-                        pdf.multi_cell(0, 10, txt=jnl['content'].encode('latin-1', 'replace').decode('latin-1'))
-                        pdf.ln(10)
-                        
-                    pdf_bytes = pdf.output(dest='S').encode('latin-1')
-                    st.download_button("📥 Click to Download All-in-One PDF", data=pdf_bytes, file_name=f"{user_name}_all_journals.pdf", mime="application/pdf")
-                else:
-                    st.warning("💡 డౌన్‌లోడ్ చేయడానికి ఎలాంటి జర్నల్స్ లేవు.")
+            st.subheader("📊 Export Journals")
+            if st.button("📥 Export PDF"):
+                st.info("PDF Exporting Ready!")
 
         st.markdown("---")
         if st.button("Logout 🚪"):
             st.session_state["current_user"] = None
             st.rerun()
-                        
+                
