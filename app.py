@@ -5,6 +5,17 @@ from PIL import Image
 # Streamlit Page Configuration
 st.set_page_config(page_title="Ultra Fast Gemini AI", page_icon="⚡", layout="centered")
 
+# Hide Streamlit Footer, Header toolbar & "Manage app" button completely
+hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    div[data-testid="stToolbar"] {visibility: hidden; display: none;}
+    .viewerBadge_container__1QSob {display: none !important;}
+    </style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 # Retrieve Gemini API Key from Streamlit Secrets
 api_key = st.secrets.get("GEMINI_API_KEY")
 
@@ -15,38 +26,63 @@ if not api_key:
 # Configure Gemini Client
 genai.configure(api_key=api_key)
 
-# High-Speed Gemini Model setup with fast generation options
+# High-Speed Gemini Model setup with Google Search Grounding Enabled
 generation_config = {
-    "temperature": 0.3, # Low temperature for faster & precise output
-    "max_output_tokens": 2048,
+    "temperature": 0.2,
+    "max_output_tokens": 1024,
 }
 
-model = genai.GenerativeModel("gemini-3.8-flash", generation_config=generation_config)
+model = genai.GenerativeModel(
+    model_name="gemini-3.8-flash",
+    generation_config=generation_config,
+    tools=["google_search"]
+)
 
-st.title("⚡ Ultra Fast Gemini AI Pro")
-st.write("అతి వేగంగా టెక్స్ట్, ఇమేజ్ మరియు డ్యాక్యుమెంట్లను అనలైజ్ చేయండి.")
+st.title("⚡ Ultra Fast Gemini AI (Live Search)")
+st.write("గూగుల్ లాగా లైవ్ వెబ్ సెర్చ్ చేసి క్షణాల్లో సమాధానం పొందండి.")
 
 # Language Switcher
 language = st.selectbox(
     "భాషను ఎంచుకోండి / Select Language:",
-    ["తెలుగు (Telugu)", "English"]
+    ["తెలుగు (Telugu)", "English"],
+    key="lang_select"
 )
 
-# Set system instruction based on language selection
+# System Instructions
 if language == "తెలుగు (Telugu)":
-    lang_instruction = "దయచేసి ఎటువంటి అక్షర దోషాలు లేకుండా, శీఘ్రంగా మరియు అత్యంత స్పష్టమైన తెలుగులో సమాధానం ఇవ్వండి."
+    lang_instruction = (
+        "మీరు చాలా వేగంగా స్పందించే AI అసిస్టెంట్ మరియు అవసరమైనప్పుడు గూగుల్ ద్వారా లైవ్ సమాచారాన్ని వెతికి తెలపగలరు. "
+        "యూజర్ కేవలం 'హాయ్' లేదా 'Hi' అంటే, 'నమస్కారం! నేను మీకు ఏవిధంగా సహాయపడగలను?' అని తక్షణమే బదులివ్వండి. "
+        "మిగతా ప్రశ్నలకు వెబ్ నుండి తాజా సమాచారాన్ని సేకరించి, ఎటువంటి అక్షర దోషాలు లేకుండా స్పష్టంగా మరియు సెకన్లలో సమాధానం ఇవ్వండి."
+    )
 else:
-    lang_instruction = "Please provide fast, highly accurate responses with zero spelling or grammatical errors in English."
+    lang_instruction = (
+        "You are an ultra-fast AI assistant with live Google Search capabilities. "
+        "If the user simply says 'Hi', respond instantly with 'Hello! How can I help you today?'. "
+        "For other queries, search the web live and provide lightning-fast, highly accurate responses with zero errors."
+    )
 
-# Multi-file Uploader (Images and PDFs)
-uploaded_file = st.file_uploader("ఫైల్ అప్‌లోడ్ చేయండి (JPG, PNG, PDF)", type=["jpg", "jpeg", "png", "pdf"])
+# Initialize Chat History in Session State if not exists
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# User Text Input
-user_prompt = st.text_area("మీ ప్రశ్న ఇక్కడ టైప్ చేయండి...", height=100, key="prompt_input")
+# Display prior chat messages
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-if st.button("⚡ పంపండి (Send)", type="primary"):
-    if user_prompt or uploaded_file:
-        with st.spinner("రెస్పాన్స్ సిద్ధమవుతోంది..."):
+# File Uploader (Images and PDFs)
+uploaded_file = st.file_uploader("ఫైల్ అప్‌లోడ్ చేయండి (JPG, PNG, PDF - ఆప్షనల్)", type=["jpg", "jpeg", "png", "pdf"], key="file_up")
+
+# User Text Input via Streamlit Chat Input for a native mobile experience
+if user_prompt := st.chat_input("మీ ప్రశ్న ఇక్కడ టైప్ చేయండి..."):
+    # Append user message to state
+    st.session_state.messages.append({"role": "user", "content": user_prompt})
+    with st.chat_message("user"):
+        st.markdown(user_prompt)
+
+    with st.chat_message("assistant"):
+        with st.spinner("లైవ్ వెబ్ సెర్చ్ జరుగుతోంది..."):
             try:
                 full_prompt = f"{lang_instruction}\n\nUser Query: {user_prompt}"
                 content_input = [full_prompt]
@@ -56,30 +92,30 @@ if st.button("⚡ పంపండి (Send)", type="primary"):
                         image = Image.open(uploaded_file)
                         content_input.append(image)
                     elif uploaded_file.type == "application/pdf":
-                        # Process PDF using bytes for fast inline processing
                         pdf_data = {
                             "mime_type": "application/pdf",
                             "data": uploaded_file.getvalue()
                         }
                         content_input.append(pdf_data)
 
-                # Fast Gemini API Call
+                # Generate response
                 response = model.generate_content(content_input)
                 output_text = response.text
 
-                st.success("రెస్పాన్స్ సిద్ధం!")
                 st.markdown(output_text)
+                
+                # Append assistant response to state
+                st.session_state.messages.append({"role": "assistant", "content": output_text})
 
-                # Download Button for Output Result
+                # Download Button for the response
                 st.download_button(
-                    label="📄 రెస్పాన్స్‌ని డౌన్‌లోడ్ చేయండి (Download Output)",
+                    label="📄 ఈ రెస్పాన్స్‌ని డౌన్‌లోడ్ చేయండి",
                     data=output_text,
                     file_name="gemini_response.txt",
-                    mime="text/plain"
+                    mime="text/plain",
+                    key="dl_btn"
                 )
 
             except Exception as e:
                 st.error(f"ఎర్రర్ వచ్చింది: {e}")
-    else:
-        st.warning("దయచేసి ఏదైనా ఒక ప్రశ్నను టైప్ చేయండి లేదా ఫైల్‌ని అప్‌లోడ్ చేయండి.")
-        
+            
